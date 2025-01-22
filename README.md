@@ -1,5 +1,5 @@
 ## Project name
-spring-azure-passwordlessdbapp - sample Spring Boot application to test AzureDevOps and access from VM/AKS to Azure Database for PostgreSQL with passwordless option enabled.
+spring-azure-passwordlessdbapp - sample Spring Boot application to try Azure DevOps and access from VM/AKS to Azure Database for PostgreSQL with passwordless option enabled.
 
 ## Table of contents
 - [Project name](#project-name)
