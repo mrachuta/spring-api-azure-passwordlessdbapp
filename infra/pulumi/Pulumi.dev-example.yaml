@@ -1,0 +1,9 @@
+config:
+  azure-native:location: eastus
+  az-complex-stack:resourcePrefix: saa
+  az-complex-stack:resourceTags:
+    app: passwordlessdbapp
+    deployed-by: pulumi
+  az-complex-stack:sshPublicKeyPath: <your_pubkey_path>
+  az-complex-stack:whitelistedIpRanges:
+    - <your_publicip_address>/32

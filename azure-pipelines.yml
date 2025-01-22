@@ -1,0 +1,126 @@
+# Redefine Build.BuildNumber
+name: $(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMddHHmm).$(Rev:r)
+
+trigger:
+  branches:
+    include:
+    - 'master'
+
+# It's required to set variable group before pipeline
+variables: 
+- group: 'acr_registry'
+
+pool: my-pool
+
+stages:
+- stage: Preparation
+  jobs:
+  - job: DockerPreparation
+    steps:
+    - script: docker --version
+      displayName: 'Check docker/podman version'
+    - script: docker run hello-world
+      displayName: 'Run hello-world image'
+  - job: MavenPreparation
+    steps:
+    - script: ./mvnw --version
+      displayName: 'Check maven version'
+
+- stage: Tests
+  dependsOn: Preparation
+  jobs:
+  - job: UnitTests
+    steps:
+    - script: ./mvnw clean test
+      displayName: 'Run maven test phase'
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Pipeline.Workspace)'
+        publishLocation: 'pipeline'
+        artifact: MavenTestArtifacts-$(Build.BuildNumber)
+      displayName: 'Stash workspace'
+
+  - job: GenerateTestReports
+    dependsOn: UnitTests
+    steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifact: MavenTestArtifacts-$(Build.BuildNumber)
+      displayName: 'Unstash workspace'
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: 'JaCoCo'
+        summaryFileLocation: '**/target/site/jacoco/jacoco.xml'
+        pathToSources: '**/src/main/java'
+        reportDirectory: '**/target/site/jacoco/'
+        failIfCoverageEmpty: true
+      displayName: 'Publish coverage results'
+
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        failTaskOnFailedTests: true
+        failTaskOnFailureToPublishResults: true
+        failTaskOnMissingResultsFile: true
+      displayName: 'Publish test results'
+
+- stage: CreateArtifacts
+  dependsOn: Tests
+  jobs:
+  - job: CreateJarPackage
+    steps:
+    - script: ./mvnw package -DskipTests
+      displayName: 'Run maven package phase'
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Pipeline.Workspace)'
+        publishLocation: 'pipeline'
+        artifact: MavenPackageArtifacts-$(Build.BuildNumber)
+      displayName: 'Stash workspace'
+  - job: CreateContainerImage
+    dependsOn: CreateJarPackage
+    steps:
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifact: MavenPackageArtifacts-$(Build.BuildNumber)
+      displayName: 'Unstash workspace'
+      # Helpful post: https://github.com/fabric8io/docker-maven-plugin/issues/1330#issuecomment-755308720
+    - script: |
+         #!/bin/bash
+         set -xeu -o pipefail
+         export DOCKER_HOST="unix:/tmp/storage-run-$(id -u)/podman/podman.sock"
+         podman system service -t 600 &
+         ./mvnw docker:build
+      displayName: 'Run maven docker:build goal'
+    - script: echo "##vso[task.setvariable variable=IMAGE_ID;isOutput=true]$(podman image ls --sort created -q | head -n 1)"
+      name: getimageid
+      displayName: Get docker image ID
+
+- stage: ManageArtifacts
+  dependsOn: CreateArtifacts
+  variables: 
+    IMAGE_ID: $[ stageDependencies.CreateArtifacts.CreateContainerImage.outputs['getimageid.IMAGE_ID'] ]
+  jobs:
+  - job: LoginToAzure
+    steps:
+    - script: az login --identity
+      displayName: 'Authenticate to Azure using managed identity'
+    - script: podman login ${ACR_NAME}.azurecr.io -u ${ACR_LOGIN} -p $(az acr login -n ${ACR_NAME} --expose-token -o tsv --query accessToken)
+      env:
+        ACR_NAME: $(acr_name)
+        ACR_LOGIN: $(acr_login)
+      displayName: 'Authenticate to ACR'
+  - job: PushImageToArtifactRegistry
+    dependsOn: LoginToAzure
+    steps:
+    - script: |
+        #!/bin/bash
+        set -xeu -o pipefail
+        export NEW_IMAGE_TAG=$(podman image inspect --format '{{index .RepoTags 0}}' $IMAGE_ID |\
+        sed "s/^localhost/${ACR_NAME}.azurecr.io/")
+        podman tag $IMAGE_ID $NEW_IMAGE_TAG
+        podman push $NEW_IMAGE_TAG
+      env:
+        ACR_NAME: $(acr_name)
+      displayName: 'Tag image and push'
