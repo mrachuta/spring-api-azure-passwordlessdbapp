@@ -114,7 +114,7 @@ Azure DevOps pipeline created with support of following articles:
 
 ### Azure Pipelines
 
-1. Guidelines are assuming that you already forked repository to Azure DevOps and created pipeline from available source.
+1. Guidelines are assuming that you already forked repository to Azure DevOps.
 2. Generate Personal Access Token via web interface:
    [https://dev.azure.com/<your_organization_name>/_usersSettings/tokens](https://dev.azure.com/<your_organization_name>/_usersSettings/token) 
    
@@ -153,7 +153,10 @@ Azure DevOps pipeline created with support of following articles:
     -e AZP_AGENT_NAME="my-pool-azp-agent-linux-podman" \
     --name "azp-agent-linux-podman" localhost/azuredevops-agent:1.0
     ```
-8. During first run of pipeline it will ask you for permission to access variables. Grant it.
+8. Return to Azure DevOps UI and create new pipelines:
+    * for *ci* pipeline select following file: *./azure/azure-pipelines-ci.yml*
+    * for *cd* pipeline select following file: *./azure/azure-pipelines-cd.yml*
+    * during first run of pipelines you will be asked for access to agent and secrets. You have to confirm this access.
 
 ### Local development
 
