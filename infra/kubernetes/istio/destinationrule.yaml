@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: spring-api-azure-passwordlessdbapp
+  labels:
+    app: spring-api-azure-passwordlessdbapp
+    app.kubernetes.io/name: spring-api-azure-passwordlessdbapp
+spec:
+  host: # To be filled in by kustomize
+  subsets:
+    - name: spring-api-azure-passwordlessdbapp-v1
+      labels:
+        app: spring-api-azure-passwordlessdbapp
+        app.kubernetes.io/name: spring-api-azure-passwordlessdbapp
+        version: v1
+        app.kubernetes.io/version: v1
+    - name: spring-api-azure-passwordlessdbapp-v2
+      labels:
+        app: spring-api-azure-passwordlessdbapp
+        app.kubernetes.io/name: spring-api-azure-passwordlessdbapp
+        version: v2
+        app.kubernetes.io/version: v2

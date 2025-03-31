@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: spring-api-azure-passwordlessdbapp
+    app.kubernetes.io/name: spring-api-azure-passwordlessdbapp
+  name: spring-api-azure-passwordlessdbapp
+  namespace: default
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: http
+    name: http
+  selector:
+    app: spring-api-azure-passwordlessdbapp
+    app.kubernetes.io/name: spring-api-azure-passwordlessdbapp
+  type: ClusterIP
+status:
+  loadBalancer: {}

@@ -1,0 +1,51 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: dev-env
+nameSuffix: -dev-env
+resources:
+  - ../../base
+  # Comment out line if you want standard deployment without istio
+  - ../../istio
+
+patches:
+  # Image to be deployed
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: mzraacr01.azurecr.io/spring-api-azure-passwordlessdbapp:1.2.0
+    target:
+      kind: Deployment
+  # Azure database details
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/valueFrom/secretKeyRef/name
+        value: sc-passwordlessdbapp01-secret
+      - op: replace
+        path: /spec/template/spec/containers/0/env/1/valueFrom/secretKeyRef/name
+        value: sc-passwordlessdbapp01-secret
+      - op: replace
+        path: /spec/template/spec/serviceAccountName
+        value: sc-account-1393f958-7003-4452-92a3-dad030c7e26b
+    target:
+      kind: Deployment
+  # Istio objects
+  - patch: |-
+      - op: replace
+        path: /spec/host
+        value: spring-api-azure-passwordlessdbapp-dev-env
+    target:
+      kind: DestinationRule
+  - patch: |-
+      - op: replace
+        path: /spec/hosts
+        value: 
+          - spring-api-azure-passwordlessdbapp-dev-env
+      - op: replace
+        path: /spec/http/0/route/0/destination/host
+        value: spring-api-azure-passwordlessdbapp-dev-env
+      - op: replace
+        path: /spec/http/0/route/1/destination/host
+        value: spring-api-azure-passwordlessdbapp-dev-env
+    target:
+      kind: VirtualService

@@ -1,5 +1,5 @@
 ## Project name
-spring-azure-passwordlessdbapp - sample Spring Boot application to try Azure DevOps and access from VM/AKS to Azure Database for PostgreSQL with passwordless option enabled.
+spring-api-azure-passwordlessdbapp - sample Spring Boot application to try Azure DevOps and access from VM/AKS to Azure Database for PostgreSQL with passwordless option enabled.
 
 ## Table of contents
 - [Project name](#project-name)
@@ -101,8 +101,21 @@ Azure DevOps pipeline created with support of following articles:
       * Install az-cli extension and create Service Connector (don't worry, Azure will create namespace for you):
         ```
         az login
+
         az extension add --name serviceconnector-passwordless --upgrade
-        az aks connection create postgres-flexible --connection passwordlessdbapp02 --source-id $(az aks list --query "[?tags.app=='passwordlessdbapp'].id" --output tsv) --target-id $(az postgres flexible-server list --query "[?tags.app=='passwordlessdbapp'].id" --output tsv)/databases/passwordlessdbapp02 --client-type springBoot --workload-identity $(az identity list --query "[?contains(name, 'passwordlessdbapp-umi01')].id" --output tsv) --kube-namespace demo --customized-keys spring.datasource.azure.passwordless-enabled=SPRING_DATASOURCE_AZURE_PASSWORDLESSENABLED spring.cloud.azure.credential.client-id=SPRING_CLOUD_AZURE_CREDENTIAL_CLIENTID spring.cloud.azure.credential.managed-identity-enabled=SPRING_CLOUD_AZURE_CREDENTIAL_MANAGEDIDENTITYENABLED spring.datasource.url=SPRING_DATASOURCE_URL spring.datasource.username=SPRING_DATASOURCE_USERNAME
+
+        az aks connection create postgres-flexible --connection passwordlessdbapp02 \
+        --source-id $(az aks list --query "[?tags.app=='passwordlessdbapp'].id" --output tsv) \
+        --target-id $(az postgres flexible-server list \
+        --query "[?tags.app=='passwordlessdbapp'].id" --output tsv)/databases/passwordlessdbapp02 \
+        --client-type springBoot --workload-identity $(az identity list --query "[?contains(name, 'passwordlessdbapp-umi01')].id" --output tsv) \
+        --kube-namespace demo \
+        --customized-keys \
+        spring.datasource.azure.passwordless-enabled=SPRING_DATASOURCE_AZURE_PASSWORDLESSENABLED \
+        spring.cloud.azure.credential.client-id=SPRING_CLOUD_AZURE_CREDENTIAL_CLIENTID \
+        spring.cloud.azure.credential.managed-identity-enabled=SPRING_CLOUD_AZURE_CREDENTIAL_MANAGEDIDENTITYENABLED \
+        spring.datasource.url=SPRING_DATASOURCE_URL spring.datasource.username=SPRING_DATASOURCE_USERNAME
+
         az logout
         ```
 
@@ -122,9 +135,12 @@ Azure DevOps pipeline created with support of following articles:
 3. Create variable group and variables using cli:
     ```
     az login
-    
     az extension add --name azure-devops
-    az pipelines variable-group create --name acr_registry --variables acr_login=00000000-0000-0000-0000-000000000000 acr_name=$(az acr list --query "[?tags.apps=='passwordlessdbapp'].name" --output tsv)
+
+    az pipelines variable-group create \
+    --name acr_registry \
+    --variables acr_login=00000000-0000-0000-0000-000000000000 \
+    acr_name=$(az acr list --query "[?tags.apps=='passwordlessdbapp'].name" --output tsv)
     ```
 4. Create agentpool via web interface: 
    [https://dev.azure.com/<your_organization_name>/_settings/agentpools](https://dev.azure.com/<your_organization_name>/_settings/agentpools)

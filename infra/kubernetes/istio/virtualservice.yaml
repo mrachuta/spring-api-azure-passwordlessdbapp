@@ -1,0 +1,27 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: spring-api-azure-passwordlessdbapp
+  labels:
+    app: spring-api-azure-passwordlessdbapp
+    app.kubernetes.io/name: spring-api-azure-passwordlessdbapp
+spec:
+  hosts: 
+    - # To be filled in by kustomize
+  gateways:
+    - mesh
+  http:
+    - name: "default-splitting"
+      route:
+        - destination:
+            host: # To be filled in by kustomize
+            port: 
+              number: 8080
+            subset: spring-api-azure-passwordlessdbapp-v1
+          weight: 50
+        - destination:
+            host: # To be filled in by kustomize
+            port: 
+              number: 8080
+            subset: spring-api-azure-passwordlessdbapp-v2
+          weight: 50
