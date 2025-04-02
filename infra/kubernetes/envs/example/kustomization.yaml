@@ -1,0 +1,52 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: demo
+nameSuffix: -demo
+resources:
+  - ../../base
+  # Comment out line if you want standard deployment without istio
+  # - ../../istio
+
+patches:
+  # Image to be deployed
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: <your_image_path>
+    target:
+      kind: Deployment
+  # Azure database details
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/valueFrom/secretKeyRef/name
+        value: <your_secret_name>
+      - op: replace
+        path: /spec/template/spec/containers/0/env/1/valueFrom/secretKeyRef/name
+        value: <your_secret_name>
+      - op: replace
+        path: /spec/template/spec/serviceAccountName
+        value: <your_serviceaccount_name>
+    target:
+      kind: Deployment
+  # Istio objects
+  # Comment out line if you want standard deployment without istio
+  # - patch: |-
+  #     - op: replace
+  #       path: /spec/host
+  #       value: spring-api-azure-passwordlessdbapp-demo
+  #   target:
+  #     kind: DestinationRule
+  # - patch: |-
+  #     - op: replace
+  #       path: /spec/hosts
+  #       value: 
+  #         - spring-api-azure-passwordlessdbapp-demo
+  #     - op: replace
+  #       path: /spec/http/0/route/0/destination/host
+  #       value: spring-api-azure-passwordlessdbapp-demo
+  #     - op: replace
+  #       path: /spec/http/0/route/1/destination/host
+  #       value: spring-api-azure-passwordlessdbapp-demo
+  #   target:
+  #     kind: VirtualService

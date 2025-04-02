@@ -30,6 +30,7 @@ patches:
     target:
       kind: Deployment
   # Istio objects
+  # Comment out line if you want standard deployment without istio
   - patch: |-
       - op: replace
         path: /spec/host
