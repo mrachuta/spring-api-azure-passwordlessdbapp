@@ -33,6 +33,10 @@ spec:
         # Important label to mutate pod
         azure.workload.identity/use: "true"
     spec:
+      volumes:
+      - emptyDir:
+          sizeLimit: 500Mi
+        name: tmp
       containers:
       - env:
         # DB username is the same as service account name for classical approach with manual DB update
@@ -97,6 +101,9 @@ spec:
             drop:
               - ALL
           readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
