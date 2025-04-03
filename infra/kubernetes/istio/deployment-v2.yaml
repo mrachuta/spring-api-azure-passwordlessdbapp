@@ -87,18 +87,18 @@ spec:
             port: 8080
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 1000
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+          capabilities:
+            drop:
+              - ALL
+          readOnlyRootFilesystem: true
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      securityContext:
-        allowPrivilegeEscalation: false
-        runAsUser: 1000
-        runAsNonRoot: true
-        seccompProfile:
-          type: RuntimeDefault
-        capabilities:
-          drop:
-            - ALL
-        readOnlyRootFilesystem: true
       terminationGracePeriodSeconds: 30
       serviceAccountName: # To be filled in by kustomize
