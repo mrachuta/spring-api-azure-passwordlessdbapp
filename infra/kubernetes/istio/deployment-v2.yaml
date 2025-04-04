@@ -57,6 +57,8 @@ spec:
               key: SPRING_DATASOURCE_URL
         - name: STYLE_VERSION
           value: v2
+        - name: RANDOM_DELAYS
+          value: "true"
         image: 
         imagePullPolicy: IfNotPresent
         name: app
