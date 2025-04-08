@@ -31,21 +31,26 @@ public class TodoController {
 
     @GetMapping("/task")
     public Iterable<Todo> getTodos() {
+        if (randomDelays) {
+            // Possible sleep times: 0 ms, 2000 ms, 4000 ms, 6000 ms
+            int[] sleepOptions = {0, 2000, 4000, 6000};
+            int sleepTime = sleepOptions[ThreadLocalRandom.current().nextInt(sleepOptions.length)];
+
+            if (sleepTime > 0) {
+                try {
+                    System.out.println("RANDOM_DELAYS: Sleeping for " + sleepTime + " milliseconds...");
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    System.err.println("RANDOM_DELAYS: Sleep interrupted: " + e.getMessage());
+                }
+            }
+        }
         return todoRepository.findAll();
     }
 
     @GetMapping("/config")
     public Map<String, Object> getConfigurationAsJson() {
-        if (randomDelays) {
-            int sleepTime = ThreadLocalRandom.current().nextInt(1000, 10001);
-            try {
-                System.out.println("Sleeping for " + sleepTime + " milliseconds...");
-                Thread.sleep(sleepTime);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                System.err.println("Sleep interrupted: " + e.getMessage());
-            }
-        }
         HashMap<String, Object> configMap = new HashMap<String, Object>();
         configMap.put("style_version", styleVersion);
         String tableStyle = (styleVersion.equals("v2")) ? "table-extra" : "table-standard";
