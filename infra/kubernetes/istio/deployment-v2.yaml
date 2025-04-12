@@ -61,8 +61,6 @@ spec:
           value: v2
         - name: RANDOM_DELAYS
           value: "true"
-        - name: OTEL_SERVICE_NAME
-          value: spring-api-azure-passwordlessdbapp-v2
         image: 
         imagePullPolicy: IfNotPresent
         name: app

@@ -59,8 +59,6 @@ spec:
               key: SPRING_DATASOURCE_URL
         - name: STYLE_VERSION
           value: v1
-        - name: OTEL_SERVICE_NAME
-          value: spring-api-azure-passwordlessdbapp-v1
         image: 
         imagePullPolicy: IfNotPresent
         name: app
