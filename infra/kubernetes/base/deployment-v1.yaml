@@ -34,6 +34,7 @@ spec:
         azure.workload.identity/use: "true"
       annotations:
         instrumentation.opentelemetry.io/inject-java: "dev-env/java-instrumentation"
+        instrumentation.opentelemetry.io/container-names: "app"
     spec:
       volumes:
       - emptyDir:
