@@ -35,7 +35,7 @@ spec:
       annotations:
         instrumentation.opentelemetry.io/inject-java: "dev-env/java-instrumentation"
         instrumentation.opentelemetry.io/container-names: "app"
-        fluentbit.io/include: "true"
+        fluentbit.io/collect-logs: "true"
     spec:
       volumes:
       - emptyDir:
