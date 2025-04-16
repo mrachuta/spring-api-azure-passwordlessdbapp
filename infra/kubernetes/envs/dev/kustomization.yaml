@@ -6,7 +6,7 @@ nameSuffix: -dev-env
 resources:
   - ../../base
   # Comment out line if you want standard deployment without istio
-  - ../../istio
+  #- ../../istio
 
 patches:
   # Image to be deployed
@@ -31,22 +31,22 @@ patches:
       kind: Deployment
   # Istio objects
   # Comment out line if you want standard deployment without istio
-  - patch: |-
-      - op: replace
-        path: /spec/host
-        value: spring-api-azure-passwordlessdbapp-dev-env
-    target:
-      kind: DestinationRule
-  - patch: |-
-      - op: replace
-        path: /spec/hosts
-        value: 
-          - spring-api-azure-passwordlessdbapp-dev-env
-      - op: replace
-        path: /spec/http/0/route/0/destination/host
-        value: spring-api-azure-passwordlessdbapp-dev-env
-      - op: replace
-        path: /spec/http/0/route/1/destination/host
-        value: spring-api-azure-passwordlessdbapp-dev-env
-    target:
-      kind: VirtualService
+  # - patch: |-
+  #     - op: replace
+  #       path: /spec/host
+  #       value: spring-api-azure-passwordlessdbapp-dev-env
+  #   target:
+  #     kind: DestinationRule
+  # - patch: |-
+  #     - op: replace
+  #       path: /spec/hosts
+  #       value: 
+  #         - spring-api-azure-passwordlessdbapp-dev-env
+  #     - op: replace
+  #       path: /spec/http/0/route/0/destination/host
+  #       value: spring-api-azure-passwordlessdbapp-dev-env
+  #     - op: replace
+  #       path: /spec/http/0/route/1/destination/host
+  #       value: spring-api-azure-passwordlessdbapp-dev-env
+  #   target:
+  #     kind: VirtualService
