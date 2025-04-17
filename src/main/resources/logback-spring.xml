@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Spring Boot's default logging configuration -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- Define a Spring property so we can reference it in the logback config -->
+    <springProperty name="applicationName" source="spring.application.name"/>
+
+    <!-- Define a custom appender to output JSON logs to console -->
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <!-- Timestamp -->
+                <timestamp>
+                    <fieldName>@timestamp</fieldName>
+                    <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSXXX</pattern>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+
+                <!-- Standard fields -->
+                <logLevel/>
+                <loggerName/>
+                <message/>
+                <threadName/>
+
+                <pattern>
+                    <pattern>{"app": "${applicationName}"}</pattern>
+                </pattern>
+
+                <!-- Optional: Include any additional structured information -->
+                <arguments/>
+
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- Define root logging level and attach the custom appender -->
+    <root level="INFO">
+        <appender-ref ref="JSON_CONSOLE"/>
+    </root>
+
+</configuration>

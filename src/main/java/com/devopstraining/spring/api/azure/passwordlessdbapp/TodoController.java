@@ -6,10 +6,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
 import java.util.concurrent.ThreadLocalRandom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api")
 public class TodoController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TodoController.class);
 
     @Value("${STYLE_VERSION:v1}")
     private String styleVersion;
@@ -38,11 +42,11 @@ public class TodoController {
 
             if (sleepTime > 0) {
                 try {
-                    System.out.println("RANDOM_DELAYS: Sleeping for " + sleepTime + " milliseconds...");
+                    logger.info("RANDOM_DELAYS: Sleeping for " + sleepTime + " milliseconds...");
                     Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    System.err.println("RANDOM_DELAYS: Sleep interrupted: " + e.getMessage());
+                    logger.error("RANDOM_DELAYS: Sleep interrupted: " + e.getMessage());
                 }
             }
         }
