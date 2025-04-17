@@ -2,6 +2,8 @@ package com.devopstraining.spring.api.azure.passwordlessdbapp;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,6 +76,18 @@ public class TodoController {
         HashMap<String, Object> readinessMap = new HashMap<String, Object>();
         readinessMap.put("ready", "true");
         return readinessMap;
+    }
+
+    @GetMapping("/test")
+    public List<Map<String, Object>> getTestListAsJson() {
+        List<Map<String, Object>> listOfMaps = new ArrayList<>();
+        HashMap<String, Object> testMap = new HashMap<String, Object>();
+        testMap.put("id", "1");
+        testMap.put("description", "Success");
+        testMap.put("details", "Hello from test page!");
+        testMap.put("done", true);
+        listOfMaps.add(testMap);
+        return listOfMaps;
     }
     
 }
