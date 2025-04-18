@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Random;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Value;
 import java.util.concurrent.ThreadLocalRandom;
@@ -16,6 +18,7 @@ import org.slf4j.LoggerFactory;
 public class TodoController {
 
     private static final Logger logger = LoggerFactory.getLogger(TodoController.class);
+    private final Random random = new Random();
 
     @Value("${STYLE_VERSION:v1}")
     private String styleVersion;
@@ -38,17 +41,16 @@ public class TodoController {
     @GetMapping("/task")
     public Iterable<Todo> getTodos() {
         if (randomDelays) {
-            // Possible sleep times: 0 ms, 2000 ms, 4000 ms, 6000 ms
-            int[] sleepOptions = {0, 2000, 4000, 6000};
-            int sleepTime = sleepOptions[ThreadLocalRandom.current().nextInt(sleepOptions.length)];
-
-            if (sleepTime > 0) {
+        // 25% chance of delay
+            if (random.nextInt(100) < 20) {
                 try {
-                    logger.info("RANDOM_DELAYS: Sleeping for " + sleepTime + " milliseconds...");
+                    int halfSeconds = random.nextInt(9) + 2;
+                    long sleepTime = halfSeconds * 500L;
+                    logger.info("RANDOM_DELAYS: Sleeping for {} milliseconds...", sleepTime);
                     Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    logger.error("RANDOM_DELAYS: Sleep interrupted: " + e.getMessage());
+                    logger.error("RANDOM_DELAYS: Sleep interrupted: {}", e.getMessage());
                 }
             }
         }
@@ -79,15 +81,49 @@ public class TodoController {
     }
 
     @GetMapping("/test")
-    public List<Map<String, Object>> getTestListAsJson() {
-        List<Map<String, Object>> listOfMaps = new ArrayList<>();
-        HashMap<String, Object> testMap = new HashMap<String, Object>();
+    public ResponseEntity<List<Map<String, Object>>> getTestListAsJson() {
+
+        // 20% chance of delay
+        if (random.nextInt(100) < 20) {
+            try {
+                int halfSeconds = random.nextInt(9) + 2; // 2 to 10
+                long sleepTime = halfSeconds * 500L;
+                logger.info("RANDOM_DELAYS: Sleeping for {} milliseconds...", sleepTime);
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.error("RANDOM_DELAYS: Sleep interrupted: {}", e.getMessage());
+            }
+        }
+
+        // 10% chance of error
+        if (random.nextInt(100) < 10) {
+            int[] errorCodes = {502, 503, 504};
+            int errorCode = errorCodes[random.nextInt(errorCodes.length)];
+            String errorMessage = switch (errorCode) {
+                case 502 -> "Bad Gateway";
+                case 503 -> "Service Unavailable";
+                case 504 -> "Gateway Timeout";
+                default -> "Unexpected Error";
+            };
+
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("id", "error");
+            errorResponse.put("description", "Error");
+            errorResponse.put("details", errorMessage);
+            errorResponse.put("done", false);
+
+            logger.warn("RANDOM_ERRORS: Returning HTTP {} - {}", errorCode, errorMessage);
+            return ResponseEntity.status(errorCode).body(List.of(errorResponse));
+        }
+
+        // Normal success response
+        Map<String, Object> testMap = new HashMap<>();
         testMap.put("id", "1");
         testMap.put("description", "Success");
         testMap.put("details", "Hello from test page!");
         testMap.put("done", true);
-        listOfMaps.add(testMap);
-        return listOfMaps;
+
+        return ResponseEntity.ok(List.of(testMap));
     }
-    
 }
