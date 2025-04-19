@@ -83,8 +83,35 @@ public class TodoController {
     @GetMapping("/test")
     public ResponseEntity<List<Map<String, Object>>> getTestListAsJson() {
 
-        // 20% chance of delay
-        if (random.nextInt(100) < 20) {
+        // 10% chance of error
+        if (random.nextInt(100) < 10) {
+            int[] errorCodes = {500, 501, 502, 503, 504};
+            int errorCode = errorCodes[random.nextInt(errorCodes.length)];
+            String errorMessage = switch (errorCode) {
+                case 500 -> "Internal Server Error";
+                case 501 -> "Not Implemented";
+                case 502 -> "Bad Gateway";
+                case 503 -> "Service Unavailable";
+                case 504 -> "Gateway Timeout";
+                default -> "Unexpected Error";
+            };
+
+            if (errorCode == 500) {
+                throw new NullPointerException(errorCode + " error: "+ errorMessage);
+            }
+
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("id", "1");
+            errorResponse.put("description", "Error");
+            errorResponse.put("details", errorMessage);
+            errorResponse.put("done", false);
+            
+            logger.error("RANDOM_ERRORS: Returning HTTP {} - {}", errorCode, errorMessage);
+            return ResponseEntity.status(errorCode).body(List.of(errorResponse));
+        }
+
+        // 15% chance of delay
+        if (random.nextInt(100) < 15) {
             try {
                 int halfSeconds = random.nextInt(9) + 2; // 2 to 10
                 long sleepTime = halfSeconds * 500L;
@@ -94,27 +121,6 @@ public class TodoController {
                 Thread.currentThread().interrupt();
                 logger.error("RANDOM_DELAYS: Sleep interrupted: {}", e.getMessage());
             }
-        }
-
-        // 10% chance of error
-        if (random.nextInt(100) < 10) {
-            int[] errorCodes = {502, 503, 504};
-            int errorCode = errorCodes[random.nextInt(errorCodes.length)];
-            String errorMessage = switch (errorCode) {
-                case 502 -> "Bad Gateway";
-                case 503 -> "Service Unavailable";
-                case 504 -> "Gateway Timeout";
-                default -> "Unexpected Error";
-            };
-
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("id", "error");
-            errorResponse.put("description", "Error");
-            errorResponse.put("details", errorMessage);
-            errorResponse.put("done", false);
-
-            logger.warn("RANDOM_ERRORS: Returning HTTP {} - {}", errorCode, errorMessage);
-            return ResponseEntity.status(errorCode).body(List.of(errorResponse));
         }
 
         // Normal success response
