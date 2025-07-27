@@ -45,28 +45,28 @@ patches:
       name: spring-api-azure-passwordlessdbapp-v2
   # Istio objects
   # Comment out lines if you want standard deployment without istio
-  - patch: |-
-      - op: replace
-        path: /spec/host
-        value: spring-api-azure-passwordlessdbapp-dev-env
-    target:
-      kind: DestinationRule
-  - patch: |-
-      - op: replace
-        path: /spec/hosts
-        value: 
-          - spring-api-azure-passwordlessdbapp-dev-env
-      - op: replace
-        path: /spec/http/0/route/0/destination/host
-        value: spring-api-azure-passwordlessdbapp-dev-env
-      - op: replace
-        path: /spec/http/0/route/1/destination/host
-        value: spring-api-azure-passwordlessdbapp-dev-env
-      - op: replace
-        path: /spec/http/0/route/0/weight
-        value: 10
-      - op: replace
-        path: /spec/http/0/route/1/weight
-        value: 90
-    target:
-      kind: VirtualService
+  # - patch: |-
+  #     - op: replace
+  #       path: /spec/host
+  #       value: spring-api-azure-passwordlessdbapp-dev-env
+  #   target:
+  #     kind: DestinationRule
+  # - patch: |-
+  #     - op: replace
+  #       path: /spec/hosts
+  #       value: 
+  #         - spring-api-azure-passwordlessdbapp-dev-env
+  #     - op: replace
+  #       path: /spec/http/0/route/0/destination/host
+  #       value: spring-api-azure-passwordlessdbapp-dev-env
+  #     - op: replace
+  #       path: /spec/http/0/route/1/destination/host
+  #       value: spring-api-azure-passwordlessdbapp-dev-env
+  #     - op: replace
+  #       path: /spec/http/0/route/0/weight
+  #       value: 10
+  #     - op: replace
+  #       path: /spec/http/0/route/1/weight
+  #       value: 90
+  #   target:
+  #     kind: VirtualService
