@@ -6,7 +6,7 @@ nameSuffix: -dev-env
 resources:
   - ../../base
   # Comment out line if you want standard deployment without istio
-  - ../../istio
+  # - ../../istio
 
 patches:
   # Image to be deployed
