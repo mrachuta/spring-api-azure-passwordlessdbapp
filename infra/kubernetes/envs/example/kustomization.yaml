@@ -29,6 +29,20 @@ patches:
         value: <your_serviceaccount_name>
     target:
       kind: Deployment
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: spring-api-azure-passwordlessdbapp-v1
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: spring-api-azure-passwordlessdbapp-v2
   # Istio objects
   # Comment out line if you want standard deployment without istio
   # - patch: |-
