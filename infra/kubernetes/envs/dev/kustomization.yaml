@@ -13,7 +13,7 @@ patches:
   - patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/image
-        value: mzraacr01.azurecr.io/spring-api-azure-passwordlessdbapp:1.2.0
+        value: mzraacr01.azurecr.io/spring-api-azure-passwordlessdbapp:1.3.0
     target:
       kind: Deployment
   # Azure database details
@@ -29,7 +29,22 @@ patches:
         value: sc-account-1393f958-7003-4452-92a3-dad030c7e26b
     target:
       kind: Deployment
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 0
+    target:
+      kind: Deployment
+      name: spring-api-azure-passwordlessdbapp-v1
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: spring-api-azure-passwordlessdbapp-v2
   # Istio objects
+  # Comment out lines if you want standard deployment without istio
   - patch: |-
       - op: replace
         path: /spec/host
@@ -47,5 +62,11 @@ patches:
       - op: replace
         path: /spec/http/0/route/1/destination/host
         value: spring-api-azure-passwordlessdbapp-dev-env
+      - op: replace
+        path: /spec/http/0/route/0/weight
+        value: 10
+      - op: replace
+        path: /spec/http/0/route/1/weight
+        value: 90
     target:
       kind: VirtualService

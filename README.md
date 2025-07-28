@@ -198,9 +198,9 @@ Azure DevOps pipeline created with support of following articles:
 
     podman login <your_registry_name>.azurecr.io -u 00000000-0000-0000-0000-000000000000 -p $(az acr login -n <your_registry_name> --expose-token -o tsv --query accessToken)
 
-    podman tag localhost/passwordlessdbapp:<created_image_tag> <your_registry_name>/passwordlessdbapp:<created_image_tag>
+    podman tag localhost/spring-api-azure-passwordlessdbapp:<created_image_tag> <your_registry_name>/spring-api-azure-passwordlessdbapp:<created_image_tag>
 
-    podman push <your_registry_name>/passwordlessdbapp:<created_image_tag>
+    podman push <your_registry_name>/spring-api-azure-passwordlessdbapp:<created_image_tag>
     ```
 
 ### Production (VM)
@@ -223,15 +223,15 @@ Azure DevOps pipeline created with support of following articles:
     export IMAGE_PATH=<path_to_your_image_in_acr>
     export SA_NAME=$(k get sa -n demo -l azure.workload.identity/use=true -o jsonpath="{.items[0].metadata.name}")
 
-    sed -i 's|<your_secret_name>|sc-passwordlessdbapp02-secret|g' infra/kubernetes/deployment.yaml
-    sed -i "s|<your_image_path>|$IMAGE_PATH|g" infra/kubernetes/deployment.yaml
-    sed -i "s|<your_serviceaccount_name>|$SA_NAME|g" infra/kubernetes/deployment.yaml
+    sed -i 's|<your_secret_name>|sc-passwordlessdbapp02-secret|g' infra/kubernetes/envs/example/kustomizaton.yaml
+    sed -i "s|<your_image_path>|$IMAGE_PATH|g" infra/kubernetes/envs/example/kustomizaton.yaml
+    sed -i "s|<your_serviceaccount_name>|$SA_NAME|g" infra/kubernetes/envs/example/kustomizaton.yaml
     ```
 2. Deploy manifests
     ```
     kubectl create namespace demo || true
-    kubectl apply -f infra/kubernetes/service.yaml
-    kubectl apply -f infra/kubernetes/deployment.yaml
+    cd infra/kubernetes/envs/example/
+    kubectl apply -k .
     ```
 
 ## Usage
@@ -244,7 +244,7 @@ Kubernetes version:
 ```
 kubectl run -it --rm curl -n demo --restart=Never \
 --image=curlimages/curl \
--- curl -vk http://passwordlessdbapp-svc:8080/
+-- curl -vk http://spring-api-azure-passwordlessdbapp-demo:8080/
 ```
 
 Add object to database:
@@ -259,5 +259,5 @@ kubectl run -it --rm curl -n demo --restart=Never \
 --image=curlimages/curl \
 -- curl -vk --header "Content-Type: application/json" --request POST \
 --data '{"description":"configuration","details":"congratulations, you have set up JDBC correctly!","done": "true"}' \
-http://passwordlessdbapp-svc:8080/
+http://spring-api-azure-passwordlessdbapp-demo:8080/
 ```

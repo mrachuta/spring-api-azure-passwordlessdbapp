@@ -32,7 +32,15 @@ spec:
         app.kubernetes.io/version: v1
         # Important label to mutate pod
         azure.workload.identity/use: "true"
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: "dev-env/java-instrumentation"
+        instrumentation.opentelemetry.io/container-names: "app"
+        fluentbit.io/collect-logs: "true"
     spec:
+      volumes:
+      - emptyDir:
+          sizeLimit: 500Mi
+        name: tmp
       containers:
       - env:
         # DB username is the same as service account name for classical approach with manual DB update
@@ -87,9 +95,21 @@ spec:
             port: 8080
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 1000
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+          capabilities:
+            drop:
+              - ALL
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      securityContext: {}
       terminationGracePeriodSeconds: 30
       serviceAccountName: # To be filled in by kustomize
