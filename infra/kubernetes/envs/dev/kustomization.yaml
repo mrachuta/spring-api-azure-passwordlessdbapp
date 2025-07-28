@@ -13,7 +13,7 @@ patches:
   - patch: |-
       - op: replace
         path: /spec/template/spec/containers/0/image
-        value: mzraacr01.azurecr.io/spring-api-azure-passwordlessdbapp:0.0.1-SNAPSHOT-19c0700
+        value: mzraacr01.azurecr.io/spring-api-azure-passwordlessdbapp:1.3.0
     target:
       kind: Deployment
   # Azure database details
